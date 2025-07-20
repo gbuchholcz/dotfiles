@@ -1,0 +1,107 @@
+#Bash shell prompt setup
+
+function _build_prompt {
+    local error_state="$?"
+    local blue_bg='\[\033[48;5;33m\]' # Blue background
+    local gray_bg='\[\033[48;5;240m\]' # Gray background
+    local green_bg='\[\033[48;5;2m\]'
+    local white_fg='\[\033[38;5;15m\]' # White text
+    local blue_fg='\[\033[38;5;33m\]' # Blue text
+    local gray_fg='\[\033[38;5;240m\]' # Gray text
+    local lightgray_fg='\[\033[38;5;255m\]' #Light gray text
+    local green_fg='\[\033[38;5;2m\]'
+    local red_fg='\[\033[38;5;1m\]' #Red text
+    local bold='\[\033[1m\]'
+    local reset='\[\033[0m\]'              # Reset all styles
+    local sep=""                          # Triangle separator (requires Nerd Font)
+
+    local branch=$(git branch 2>/dev/null | grep '^*' | colrm 1 2)
+    local git_info=""
+    
+    if [ "$branch" ]; then
+        status=""
+        # Check for uncommitted changes
+        if ! git diff --quiet 2>/dev/null; then
+            status="*"
+        fi
+        # Check for untracked files
+        if [ -n "$(git ls-files --others --exclude-standard 2>/dev/null)" ]; then
+            status="${status}+"
+        fi
+        # Check for staged changes
+        if ! git diff --cached --quiet 2>/dev/null; then
+            status="${status}^"
+        fi
+        git_info="${branch}${status}"
+    fi
+
+    export PS1=""
+    if [[ "${error_state}" -ne "0" ]]; then
+        PS1+="${blue_bg}${bold}${red_fg}[${error_state}]${reset}" 
+    fi
+    PS1+="${blue_bg}${white_fg}\u@\h ${blue_fg}${gray_bg}${sep}${lightgray_fg} \w "
+    if [[ -n "${git_info}" ]]; then # we are in a git repo
+        PS1+="${gray_fg}${green_bg}${sep}${white_fg} ${git_info} ${reset}${green_fg}${sep}${reset}"
+    else
+        PS1+="${reset}${gray_fg}${sep}${reset}"
+    fi 
+}
+
+setup_path() {
+    # WSL only
+    if grep -qEi "(microsoft|wsl)" /proc/version &>/dev/null; then
+        export PATH="$PATH:/usr/lib/wsl/lib"
+    fi
+
+    # Ubuntu only
+    if grep -qEi "(ubuntu)" /proc/version &>/dev/null; then
+        export PATH="$PATH:/snap/bin"
+    fi
+    export PATH="$PATH:/home/gergo/.local/bin"
+}
+
+setup_ssh_agent() {
+    
+    # Only start ssh-agent if it’s not running
+    if [ -z "$SSH_AUTH_SOCK" ] || ! [ -S "$SSH_AUTH_SOCK" ]; then
+        eval "$(ssh-agent -s)"
+    fi    
+    
+    # Add all private keys from ~/.ssh (excluding *.pub)
+    for key in ~/.ssh/id_*; do
+      # Skip public keys and non-regular files
+      if [[ -f "$key" && "$key" != *.pub ]]; then
+        # Only add key if not already added
+        if ! ssh-add -l | grep -q "$(ssh-keygen -lf "$key" | awk '{print $2}')" 2>/dev/null; then
+          ssh-add "$key"
+        fi
+      fi
+    done
+
+}
+
+source_all() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0  # Exit if not a directory
+
+  # Save current nullglob setting
+  shopt -q nullglob
+  local nullglob_was_set=$?
+
+  # Enable nullglob temporarily
+  shopt -s nullglob
+
+  for file in "$dir"/*; do
+    [[ -f "$file" ]] && . "$file"
+  done
+
+  # Restore nullglob if it wasn't originally set
+  [[ $nullglob_was_set -ne 0 ]] && shopt -u nullglob
+}
+
+
+setup_path
+setup_ssh_agent
+source_all $HOME/.local/share/completions
+export PROMPT_COMMAND=_build_prompt
+
