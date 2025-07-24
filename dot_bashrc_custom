@@ -103,5 +103,7 @@ source_all() {
 setup_path
 setup_ssh_agent
 source_all $HOME/.local/share/completions
+
 export PROMPT_COMMAND=_build_prompt
+export EDITOR=nvim
 

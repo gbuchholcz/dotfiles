@@ -13,7 +13,10 @@ vim.keymap.set("n", "<Tab>", ":bnext<CR>", opts)
 vim.keymap.set("n", "<S-Tab>", ":bprev<CR>", opts)
 
 -- Save and close buffers
-vim.keymap.set("n", "<C-q>", ":bd<CR>", opts)
+vim.keymap.set("i", "<C-q>", "<ESC>:bp | bd #<CR>", opts)
+vim.keymap.set("n", "<C-q>", ":bp | bd #<CR>", opts)
+vim.keymap.set("i", "<C-s>", "<ESC>:w<CR>", opts)
 vim.keymap.set("n", "<C-s>", ":w<CR>", opts)
+vim.keymap.set("i", "<C-S-s>", "<ESC>:wa<CR>", opts)
 vim.keymap.set("n", "<C-S-s>", ":wa<CR>", opts)
 
