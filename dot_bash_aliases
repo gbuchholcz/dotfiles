@@ -6,3 +6,5 @@ alias bat='batcat'
 
 alias chez='chezmoi'
 
+alias c="clear"
+
