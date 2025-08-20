@@ -100,12 +100,11 @@ source_all() {
 }
 
 setup_zoxide() {
-    eval "$(zoxide init bash)"
+    eval "$(zoxide init --cmd cd bash)"
 }
 
-
 setup_path
-setup_ssh_agenti
+setup_ssh_agent
 setup_zoxide
 source_all $HOME/.local/share/completions
 
