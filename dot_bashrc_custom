@@ -99,9 +99,14 @@ source_all() {
   [[ $nullglob_was_set -ne 0 ]] && shopt -u nullglob
 }
 
+setup_zoxide() {
+    eval "$(zoxide init bash)"
+}
+
 
 setup_path
-setup_ssh_agent
+setup_ssh_agenti
+setup_zoxide
 source_all $HOME/.local/share/completions
 
 export PROMPT_COMMAND=_build_prompt
