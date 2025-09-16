@@ -20,8 +20,12 @@ require('lazy').setup({
     require 'plugins.lualine',
     require 'plugins.treesitter',
     require 'plugins.telescope',
-    require 'plugins.comment'
---    require 'plugins.lsp',
+    require 'plugins.comment',
+    require 'plugins.lazydev',
+    require 'plugins.nvim-lspconfig',
+    require 'plugins.conform',
+    require 'plugins.blink'
+    --    require 'plugins.lsp',
 --    require 'plugins.autocompletion',
 --    require 'plugins.autoformatting'
 })
