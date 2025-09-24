@@ -116,6 +116,14 @@ setup_zoxide() {
     eval "$(zoxide init --cmd cd bash)"
 }
 
+setup_pyenv() {
+    export PYENV_ROOT="$HOME/.pyenv"
+    [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init - bash)"
+    # Load pyenv-virtualenv automatically
+    eval "$(pyenv virtualenv-init -)"
+}
+
 setup_path
 setup_ssh_agent
 source_all $HOME/.local/share/completions
@@ -125,4 +133,4 @@ export EDITOR=nvim
 
 # zoxide setup has to be done after any changes to PS1 or PROMPT_COMMAND
 setup_zoxide
-
+setup_pyenv
